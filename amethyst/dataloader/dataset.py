@@ -101,3 +101,25 @@ class Dataloader(object):
             return self.__user_data
         
 
+    @classmethod
+    def build(cls, data, global_user_map=None, global_item_map=None):
+        if global_user_map is None:
+            global_user_map = OrderedDict()
+        
+        if global_item_map is None:
+            global_item_map = OrderedDict()
+
+        user_id_map = OrderedDict()
+        item_id_map = OrderedDict()
+
+        user_indices = []
+        item_indices = []
+        ratings = []
+        valid_idx = []
+
+        user_index_set = set()
+        duplicates = 0
+
+        for idx, (user_id, item_id, rating, *_)
+
+
