@@ -1,5 +1,6 @@
-from _typeshed import Self
-from functools import total_ordering
+from collections import defaultdict, OrderedDict
+
+
 import numpy as np
 import pandas as pd
 
@@ -31,7 +32,9 @@ class Dataloader(object):
         
         self.__total_users = None
         self.__total_items = None
-        
+        self.__user_data = None
+        self.__item_data = None
+
     
     #* Propoerties
 
@@ -46,20 +49,55 @@ class Dataloader(object):
 
     @total_users.setter
     def total_users(self, input_val):
+        """Set total users for dataset"""
         assert input_val >= self.user_count
         self.__total_users = input_val
 
 
     @property
     def total_items(self) -> int:
+        """Total number of items"""
         return self.__total_items if self.__total_items is not None else self.item_count
 
     @total_items.setter
     def total_items(self, input_val):
+        """Sets total number of items for dataset"""
         assert input_val >= self.num_items
         self.__total_items = input_val
 
+
+    @property
+    def user_ids(self):
+        """Iterator for user ids"""
+        return self.user_id_mapping.keys()
+
+
+    @property
+    def item_ids(self):
+        """Iterator for item ids"""
+        return self.item_id_mapping.keys()
+
     
+    @property
+    def user_indices(self):
+        """Iterator for user indices"""
+        return self.user_id_mapping.values()
 
+    @property
+    def item_indices(self):
+        """Iterator for item indices"""
+        return self.item_id_mapping.values()
 
+    
+    @property
+    def user_data(self):
+        if self.__user_data is not None:
+            self.__user_data = defaultdict()
+            for user, item, rating in zip(*self.user_item_rating):
+                __u_data = self.__user_data.setdefault(user, ([], []))
+                __u_data[0].append(item)
+                __u_data[1].append(rating)
+
+            return self.__user_data
         
+
