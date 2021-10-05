@@ -102,13 +102,9 @@ class Dataloader(object):
         
 
     @classmethod
-    def build(cls, data, global_user_map=None, global_item_map=None, exclude_unknown=False):
-        if global_user_map is None:
-            global_user_map = OrderedDict()
-        
-        if global_item_map is None:
-            global_item_map = OrderedDict()
-
+    def build(cls, data, exclude_unknown=False):
+        global_user_map = OrderedDict()
+        global_item_map = OrderedDict()
         user_id_map = OrderedDict()
         item_id_map = OrderedDict()
 
@@ -120,24 +116,24 @@ class Dataloader(object):
         user_index_set = set()
         duplicates = 0
 
-        for idx, (user_id, item_id, rating, *_) in enumerate(data):
+        for idx, (_user_id, _item_id, rating, *_) in enumerate(data):
             # exclude duplicates if  set to true
             if exclude_unknown and \
-            (user_id not in global_user_map or item_id not in global_item_map):
+            (_user_id not in global_user_map or _item_id not in global_item_map):
                 continue
             
-            if (user_id, item_id) in user_index_set:
+            if (_user_id, _item_id) in user_index_set:
                 duplicates += 1
                 continue
 
-            user_index_set.add((user_id, item_id))
+            user_index_set.add((_user_id, _item_id))
 
-            user_id_map[user_id] = global_user_map.setdefault(user_id, len(global_user_map))
-            item_id_map[item_id] = global_user_map.setdefault(item_id, len(global_item_map))
+            user_id_map[_user_id] = global_user_map.setdefault(_user_id, len(global_user_map))
+            item_id_map[_item_id] = global_item_map.setdefault(_item_id, len(global_item_map))
 
             # save valid user, items, ratings and indices
-            user_indices.append(user_id_map[user_id])
-            item_indices.append(item_id_map[item_id])
+            user_indices.append(user_id_map[_user_id])
+            item_indices.append(item_id_map[_item_id])
             ratings.append(float(rating))
             valid_idx.append(idx)
 
@@ -154,11 +150,14 @@ class Dataloader(object):
         )
 
         return cls(
-            num_users=len(global_user_map),
-            num_items=len(global_item_map),
-            user_id_map=user_id_map,
-            item_id_map=item_id_map,
-            user_index_rating_tuple = user_index_rating_tuple
+            user_count=len(global_user_map),
+            item_count=len(global_item_map),
+            user_id_mapping=user_id_map,
+            item_id_mapping=item_id_map,
+            user_item_rating = user_index_rating_tuple
         )
 
         
+    @classmethod
+    def dataloader(cls, data, seed=None):
+        return cls.build(data)
