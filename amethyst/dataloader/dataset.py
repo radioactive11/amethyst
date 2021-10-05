@@ -1,5 +1,5 @@
 from collections import defaultdict, OrderedDict
-
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -102,7 +102,7 @@ class Dataloader(object):
         
 
     @classmethod
-    def build(cls, data, global_user_map=None, global_item_map=None):
+    def build(cls, data, global_user_map=None, global_item_map=None, exclude_unknown=False):
         if global_user_map is None:
             global_user_map = OrderedDict()
         
@@ -120,6 +120,45 @@ class Dataloader(object):
         user_index_set = set()
         duplicates = 0
 
-        for idx, (user_id, item_id, rating, *_)
+        for idx, (user_id, item_id, rating, *_) in enumerate(data):
+            # exclude duplicates if  set to true
+            if exclude_unknown and \
+            (user_id not in global_user_map or item_id not in global_item_map):
+                continue
+            
+            if (user_id, item_id) in user_index_set:
+                duplicates += 1
+                continue
 
+            user_index_set.add((user_id, item_id))
 
+            user_id_map[user_id] = global_user_map.setdefault(user_id, len(global_user_map))
+            item_id_map[item_id] = global_user_map.setdefault(item_id, len(global_item_map))
+
+            # save valid user, items, ratings and indices
+            user_indices.append(user_id_map[user_id])
+            item_indices.append(item_id_map[item_id])
+            ratings.append(float(rating))
+            valid_idx.append(idx)
+
+        if duplicates > 0:
+            warnings.warn(f"{duplicates} duplicates removed.")
+        
+        if len(user_index_set) == 0:
+            raise ValueError("Empty dataset after de-dup")
+
+        user_index_rating_tuple = (
+            np.asarray(user_indices, dtype=np.int),
+            np.asarray(item_indices, dtype=np.int),
+            np.asarray(ratings, dtype=np.float)
+        )
+
+        return cls(
+            num_users=len(global_user_map),
+            num_items=len(global_item_map),
+            user_id_map=user_id_map,
+            item_id_map=item_id_map,
+            user_index_rating_tuple = user_index_rating_tuple
+        )
+
+        
