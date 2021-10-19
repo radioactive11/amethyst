@@ -62,3 +62,7 @@ def ratio_split(data: pd.DataFrame, ratios: List[float], shuffle: Optional[bool]
         splits[i]["split_index"] = i
     
     return splits
+
+
+def estimate_batches(input_size, batch_size):
+    return int(np.ceil(input_size / batch_size))
