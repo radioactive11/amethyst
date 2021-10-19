@@ -4,7 +4,10 @@ import warnings
 import numpy as np
 import pandas as pd
 
+from scipy.sparse import csr_matrix, dok_matrix
+from amethyst.dataloader.data_utils import estimate_batches
 
+import data_utils
 
 class Dataloader(object):
     def __init__(
@@ -14,8 +17,7 @@ class Dataloader(object):
                 user_id_mapping,
                 item_id_mapping,
                 user_item_rating,
-                seed=None,
-    ):
+                seed=None):
         self.user_count = user_count
         self.item_count = item_count
         self.user_id_mapping = user_id_mapping
@@ -35,6 +37,8 @@ class Dataloader(object):
         self.__user_data = None
         self.__item_data = None
 
+        self.__csr_matrix = None
+        self.__dok_matrix = None
     
     #* Propoerties
 
@@ -99,7 +103,46 @@ class Dataloader(object):
                 __u_data[1].append(rating)
 
             return self.__user_data
-        
+    
+
+    @property
+    def item_data(self):
+        if self.__item_data is None:
+            self.__item_data = defaultdict()
+            for u, i, r in zip(*self.user_index_rating_tuple):
+                i_data = self.__item_data.setdefault(i, ([], []))
+                i_data[0].append(u)
+                i_data[1].append(r)
+        return self.__item_data
+
+
+    @property
+    def matrix(self):
+        return self.csr_matrix
+
+
+    @property
+    def csr_matrix(self):
+        if self.__csr_matrix is None:
+            (u_indices, i_indices, r_values) = self.user_index_rating_tuple
+            self.__csr_matrix = csr_matrix(
+                (r_values, (u_indices, i_indices)),
+                shape=(self.num_users, self.num_items),
+            )
+        return self.__csr_matrix
+
+
+    @property
+    def dok_matrix(self):
+        """The user-item interaction matrix in DOK sparse format"""
+        if self.__dok_matrix is None:
+            self.__dok_matrix = dok_matrix(
+                (self.user_count, self.item_count), dtype=np.float32
+            )
+            for u, i, r in zip(*self.user_item_rating):
+                self.__dok_matrix[u, i] = r
+        return self.__dok_matrix
+
 
     @classmethod
     def build(cls, data, exclude_unknown=False):
@@ -159,5 +202,91 @@ class Dataloader(object):
 
         
     @classmethod
+    #* this is from uir
     def dataloader(cls, data, seed=None):
         return cls.build(data)
+
+    def num_batches(self, batch_size):
+        sample_length = len(self.user_item_rating[0])
+        return data_utils.estimate_batches(sample_length, batch_size)
+
+
+    def idx_iter(self, idx_range, batch_size=1):
+        indices = np.arange(idx_range)
+
+        n_batches = estimate_batches(len(indices), batch_size)
+        
+        for batch in range(n_batches):
+            start_offset = batch_size * batch
+            end_offset = batch_size * batch + batch_size
+            # check for out of bound
+            end_offset = min(end_offset, len(indices))
+            batch_ids = indices[start_offset:end_offset]
+            yield batch_ids
+
+
+    def uir_iter(self, batch_size=1, binary=False, num_zeros=0):
+        for batch_ids in self.idx_iter(len(self.user_item_rating[0]), batch_size):
+            batch_users = self.user_item_rating[0][batch_ids]
+            batch_items = self.user_item_rating[1][batch_ids]
+            if binary:
+                batch_ratings = np.ones_like(batch_items)
+            else:
+                batch_ratings = self.user_item_rating[2][batch_ids]
+
+            if num_zeros > 0:
+                repeated_users = batch_users.repeat(num_zeros)
+                neg_items = np.empty_like(repeated_users)
+                for i, u in enumerate(repeated_users):
+                    j = self.rng.randint(0, self.num_items)
+                    while self.dok_matrix[u, j] > 0:
+                        j = self.rng.randint(0, self.num_items)
+                    neg_items[i] = j
+                batch_users = np.concatenate((batch_users, repeated_users))
+                batch_items = np.concatenate((batch_items, neg_items))
+                batch_ratings = np.concatenate(
+                    (batch_ratings, np.zeros_like(neg_items))
+                )
+
+            yield batch_users, batch_items, batch_ratings
+
+
+    def uij_iter():
+        pass
+
+
+    def user_iter(self, batch_size=1):
+        user_indices = np.fromiter(self.user_indices, dtype=np.int)
+        for batch_ids in self.idx_iter(len(user_indices), batch_size):
+            yield user_indices[batch_ids]
+
+
+    def item_iter(self, batch_size=1):
+        item_indices = np.fromiter(self.item_indices, np.int)
+        for batch_ids in self.idx_iter(len(item_indices), batch_size):
+            yield item_indices[batch_ids]
+
+
+    def is_unknown_user():
+        pass
+
+
+    def is_unknown_item():
+        pass
+
+
+    def add_modalities(self, **kwargs):
+        self.user_feature = kwargs.get("user_feature", None)
+        self.item_feature = kwargs.get("item_feature", None)
+        self.user_text = kwargs.get("user_text", None)
+        self.item_text = kwargs.get("item_text", None)
+        self.user_image = kwargs.get("user_image", None)
+        self.item_image = kwargs.get("item_image", None)
+        self.user_graph = kwargs.get("user_graph", None)
+        self.item_graph = kwargs.get("item_graph", None)
+        self.sentiment = kwargs.get("sentiment", None)
+        self.review_text = kwargs.get("review_text", None)
+
+
+
+
