@@ -4,12 +4,17 @@ import copy
 import datetime
 import os
 import pickle
-import exceptions
 
-from model_utils import clip
+from torch._C import import_ir_module
+
+from amethyst.models.bivaecf.bivae import train
+
+from .model_utils import clip
+
+
 
 class BaseModel():
-    def __init__(self, name: str, trainable: True, verbose=False) -> None:
+    def __init__(self, name: str, trainable=True, verbose=False) -> None:
         self.name = name
         self.trainable = trainable
         self.verbose = verbose
@@ -85,6 +90,19 @@ class BaseModel():
 
     @staticmethod
     def load(model_path, trainable: bool=False):
+        # Todo Complete this
+        """Load model from pickled file
+
+        Args:
+            model_path (str): path to model file
+            trainable (bool, optional): Whether to stage model for training. Defaults to False.
+
+        Raises:
+            FileNotFoundError: [description]
+
+        Returns:
+            [type]: [description]
+        """
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"File not found: {model_path}")
         
@@ -97,7 +115,8 @@ class BaseModel():
 
 
     def fit(self, train_set, val_set = None):
-        self.reset()
+        self.train_set = train_set
+        self.test_set = val_set
         return self
 
     
