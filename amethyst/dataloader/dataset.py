@@ -5,9 +5,8 @@ import numpy as np
 import pandas as pd
 
 from scipy.sparse import csr_matrix, dok_matrix
-from amethyst.dataloader.data_utils import estimate_batches
 
-import data_utils
+from .data_utils import estimate_batches
 
 class Dataloader(object):
     def __init__(
@@ -124,10 +123,10 @@ class Dataloader(object):
     @property
     def csr_matrix(self):
         if self.__csr_matrix is None:
-            (u_indices, i_indices, r_values) = self.user_index_rating_tuple
+            (u_indices, i_indices, r_values) = self.user_item_rating
             self.__csr_matrix = csr_matrix(
                 (r_values, (u_indices, i_indices)),
-                shape=(self.num_users, self.num_items),
+                shape=(self.user_count, self.item_count),
             )
         return self.__csr_matrix
 
