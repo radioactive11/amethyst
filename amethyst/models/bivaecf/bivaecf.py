@@ -104,3 +104,12 @@ class BiVAECF(BaseModel):
 
         return self
         
+    
+    def eval(self, user_idx, item_idx=None):
+        if item_idx is None:
+            # all items
+            pass
+
+        else:
+            # select
+            pass
