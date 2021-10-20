@@ -1,4 +1,5 @@
 from collections import defaultdict, OrderedDict
+from typing import Counter
 import warnings
 
 import numpy as np
@@ -266,26 +267,12 @@ class Dataloader(object):
             yield item_indices[batch_ids]
 
 
-    def is_unknown_user():
-        pass
+    def is_unknown_user(self, user_idx):
+        return user_idx >= self.user_count
 
 
-    def is_unknown_item():
-        pass
-
-
-    def add_modalities(self, **kwargs):
-        self.user_feature = kwargs.get("user_feature", None)
-        self.item_feature = kwargs.get("item_feature", None)
-        self.user_text = kwargs.get("user_text", None)
-        self.item_text = kwargs.get("item_text", None)
-        self.user_image = kwargs.get("user_image", None)
-        self.item_image = kwargs.get("item_image", None)
-        self.user_graph = kwargs.get("user_graph", None)
-        self.item_graph = kwargs.get("item_graph", None)
-        self.sentiment = kwargs.get("sentiment", None)
-        self.review_text = kwargs.get("review_text", None)
-
+    def is_unknown_item(self, item_idx):
+        return item_idx >= self.item_count
 
 
 

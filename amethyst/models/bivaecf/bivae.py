@@ -1,12 +1,10 @@
 import itertools
-from typing import ItemsView
 
 import numpy as np
 import torch
 from torch._C import Value
 import torch.nn as nn
 from torch.nn import parameter
-from torch.serialization import validate_cuda_device
 
 from tqdm.std import trange
 
@@ -40,7 +38,7 @@ class BiVAE(nn.Module):
         self.mu_theta = torch.zeros((item_encoder_struc[0], k))
         self.mu_beta = torch.zeros((user_encoder_struc[0], k))
 
-        print(f"{self.mu_theta.shape=}")
+        # print(f"{self.mu_theta.shape=}")
 
         self.theta = torch.randn(item_encoder_struc[0], k) * 0.01
         self.beta = torch.randn(user_encoder_struc[0], k) * 0.01
@@ -179,16 +177,6 @@ def train(
         bivae.item_mu.parameters(),
         bivae.item_std.parameters()
     )
-
-    if bivae.cap_priors.get("user", False):
-        user_params = itertools.chain(user_params, bivae.user_prior_encoder.parameters())
-        user_features = train_set.user_feature.features[: train_set.user_count]
-
-    
-    if bivae.cap_priors.get("item", False):
-        item_params = itertools.chain(item_params, bivae.item_encoder.parameters())
-        item_features = train_set.item_feature.features[: train_set.item_count]
-
     
     u_optim = torch.optim.Adam(params=user_params, lr=alpha)
     i_optim = torch.optim.Adam(params=item_params, lr=alpha)

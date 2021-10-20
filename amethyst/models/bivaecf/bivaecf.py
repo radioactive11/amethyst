@@ -40,7 +40,6 @@ class BiVAECF(BaseModel):
 
 
     def fit(self, train_set: Dataloader, val_set=None):
-        print(type(train_set))
         BaseModel.fit(self, train_set, val_set)
 
         self.device = (
@@ -55,18 +54,6 @@ class BiVAECF(BaseModel):
                 "item": None
             }
 
-            if self.cap_priors.get("user", False):
-                if train_set.user_feature is None:
-                    raise ValueError("CAP priors for users is set to True but no user features were provided")
-
-                else:
-                    feature_dim["user"] = train_set.user_feature.feature_dim
-
-            if self.cap_priors.get("item", False):
-                if train_set.item_feature is None:
-                    raise ValueError("CAP priors for items is set to True but no item features were provided")
-                else:
-                    feature_dim["item"] = train_set.item_feature.feature_dim
 
             if self.seed is not None:
                 torch.manual_seed(self.seed)
