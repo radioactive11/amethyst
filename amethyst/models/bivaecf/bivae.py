@@ -201,10 +201,6 @@ def train(
             beta, i_batch_, i_mu, i_std = bivae(i_batch, user=False, theta=bivae.theta)
 
             i_mu_prior = 0.0  
-            if bivae.cap_priors.get("item", False):
-                i_batch_f = item_features[i_ids]
-                i_batch_f = torch.tensor(i_batch_f, dtype=dtype, device=device)
-                i_mu_prior = bivae.encode_item_prior(i_batch_f)
 
             i_loss = bivae.loss(i_batch, i_batch_, i_mu, i_mu_prior, i_std, beta_kl)
             i_optim.zero_grad()
@@ -230,10 +226,6 @@ def train(
             theta, u_batch_, u_mu, u_std = bivae(u_batch, user=True, beta=bivae.beta)
 
             u_mu_prior = float(0)
-            if bivae.cap_priors.get("user", False):
-                u_batch_f = user_features[u_ids]
-                u_batch_f = torch.tensor(u_batch_f, dtype=dtype, device=device)
-                u_mu_prior = bivae.encode_user_prior(u_batch_f)
 
             u_loss = bivae.loss(u_batch, u_batch_, u_mu, u_mu_prior, u_std, beta_kl)
             u_optim.zero_grad()

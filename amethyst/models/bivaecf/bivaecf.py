@@ -1,10 +1,9 @@
-from re import VERBOSE
-import numpy as np
-
+from torch._C import Value
 from amethyst.dataloader.dataset import Dataloader
 
-from ..base import BaseModel
 from .bivae import BiVAE, train
+from ..base import BaseModel
+from ..model_utils import scale
 import torch
 
 class BiVAECF(BaseModel):
@@ -94,9 +93,36 @@ class BiVAECF(BaseModel):
     
     def eval(self, user_idx, item_idx=None):
         if item_idx is None:
-            # all items
-            pass
+            if self.train_set.is_unknown_user(user_idx):
+                raise ValueError(
+                    "Can't make score prediction for (user_id=%d)" % user_idx
+                )
 
+            theta_u = self.bivae.mu_theta[user_idx].view(1, -1)
+            beta = self.bivae.mu_beta
+            known_item_scores = (
+                self.bivae.decode_user(theta_u, beta).cpu().numpy().ravel()
+            )
+
+            return known_item_scores
         else:
-            # select
-            pass
+            if self.train_set.is_unknown_user(user_idx) or self.train_set.is_unknown_item(
+                item_idx
+            ):
+                raise ValueError(
+                    "Can't make score prediction for (user_id=%d, item_id=%d)"
+                    % (user_idx, item_idx)
+                )
+
+            theta_u = self.bivae.mu_theta[user_idx].view(1, -1)
+            beta_i = self.bivae.mu_beta[item_idx].view(1, -1)
+            pred = self.bivae.decode_user(theta_u, beta_i).cpu().numpy().ravel()
+
+            pred = scale(
+                pred, self.train_set.min_rating, self.train_set.max_rating, 0.0, 1.0
+            )
+
+            return pred
+
+
+            
