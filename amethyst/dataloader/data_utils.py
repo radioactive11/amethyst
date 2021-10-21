@@ -2,7 +2,7 @@ from typing import List, Optional, Type
 
 import pandas as pd
 import numpy as np
-import math
+import numbers
 
 
 def verify_split_ratio(ratio: float) -> float:
@@ -66,3 +66,13 @@ def ratio_split(data: pd.DataFrame, ratios: List[float], shuffle: Optional[bool]
 
 def estimate_batches(input_size, batch_size):
     return int(np.ceil(input_size / batch_size))
+
+
+def get_rng(seed):
+    if seed is None:
+        return np.random.mtrand._rand
+    if isinstance(seed, (numbers.Integral, np.integer)):
+        return np.random.RandomState(seed)
+    if isinstance(seed, np.random.RandomState):
+        return seed
+    raise ValueError('{} can not be used to create a numpy.random.RandomState'.format(seed))
