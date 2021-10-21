@@ -7,7 +7,7 @@ import pandas as pd
 
 from scipy.sparse import csr_matrix, dok_matrix
 
-from .data_utils import estimate_batches
+from .data_utils import estimate_batches, get_rng
 
 class Dataloader(object):
     def __init__(
@@ -24,6 +24,7 @@ class Dataloader(object):
         self.item_id_mapping = item_id_mapping
         self.user_item_rating = user_item_rating
         self.rng_seed = seed
+        self.rng = get_rng(seed)
 
         (_, _, rating_vals) = user_item_rating
         self.ratings_count = len(rating_vals)
@@ -131,7 +132,7 @@ class Dataloader(object):
             )
         return self.__csr_matrix
 
-
+    # spase matric as dict of key
     @property
     def dok_matrix(self):
         """The user-item interaction matrix in DOK sparse format"""
@@ -208,7 +209,7 @@ class Dataloader(object):
 
     def num_batches(self, batch_size):
         sample_length = len(self.user_item_rating[0])
-        return data_utils.estimate_batches(sample_length, batch_size)
+        return estimate_batches(sample_length, batch_size)
 
 
     def idx_iter(self, idx_range, batch_size=1):
@@ -251,8 +252,28 @@ class Dataloader(object):
             yield batch_users, batch_items, batch_ratings
 
 
-    def uij_iter():
-        pass
+    def uij_iter(self, batch_size=1, neg_sampling="uniform"):
+        if neg_sampling == "uniform":
+            neg_population = np.arange(self.item_count)
+
+        elif neg_sampling == "popularity":
+            neg_population = self.user_item_rating[1]
+        
+        else:
+            raise ValueError(f"Invalid sampling option {neg_sampling}")
+        
+
+        for batch_ids in self.idx_iter(len(self.user_item_rating[0]), batch_size):
+            batch_users = self.user_item_rating[0][batch_ids]
+            batch_pos_items = self.user_item_rating[1][batch_ids]
+            batch_pos_ratings = self.user_item_rating[2][batch_ids]
+            batch_neg_items = np.empty_like(batch_pos_items)
+            for i, (user, pos_rating) in enumerate(zip(batch_users, batch_pos_ratings)):
+                neg_item = self.rng.choice(neg_population)
+                while self.dok_matrix[user, neg_item] >= pos_rating:
+                    neg_item = self.rng.choice(neg_population)
+                batch_neg_items[i] = neg_item
+            yield batch_users, batch_pos_items, batch_neg_items
 
 
     def user_iter(self, batch_size=1):
