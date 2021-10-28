@@ -6,7 +6,7 @@ from .base import BaseModel
 from ..dataloader.dataset import Dataloader
 
 
-def rank(model: BaseModel, data, user_col="user", item_col="item", rank_col="rank", remove_seen=False):
+def rank(model: BaseModel, data, user_col="user", item_col="item", rank_col="predictions", remove_seen=False):
     users, items, preds = [], [], []
 
     item = model.train_set.item_id_mapping.keys()

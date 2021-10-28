@@ -10,7 +10,7 @@ from tqdm.std import trange
 
 from dataloader.dataset import Dataloader
 
-
+# std deviation 
 EPS = 1e-10
 
 ACT = {
@@ -37,8 +37,6 @@ class BiVAE(nn.Module):
 
         self.mu_theta = torch.zeros((item_encoder_struc[0], k))
         self.mu_beta = torch.zeros((user_encoder_struc[0], k))
-
-        # print(f"{self.mu_theta.shape=}")
 
         self.theta = torch.randn(item_encoder_struc[0], k) * 0.01
         self.beta = torch.randn(user_encoder_struc[0], k) * 0.01
@@ -119,6 +117,7 @@ class BiVAE(nn.Module):
 
     
     def reparameterize(self, mu, std):
+        # z = mu + sigma • epsilon
         eps = torch.randn_like(mu)
         return mu + eps * std
 

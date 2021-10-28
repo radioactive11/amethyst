@@ -1,9 +1,12 @@
+from os import kill
 from amethyst.dataloader import split, dataset
 import pandas as pd
 import torch
-from amethyst.models.bivaecf.bivaecf import BiVAECF
 
+from amethyst.models.bivaecf.bivaecf import BiVAECF
+from amethyst.models.ibpr.ibprcf import IBPR
 from amethyst.models.predictions import rank
+from amethyst.eval.eval_methods import map_at_k, precision_at_k, recall_k
 
 
 df = pd.read_csv("./data/movielens100k.csv")
@@ -26,7 +29,7 @@ LATENT_DIM = 50
 ENCODER_DIMS = [100]
 ACT_FUNC = "tanh"
 LIKELIHOOD = "pois"
-NUM_EPOCHS = 500
+NUM_EPOCHS = 1
 BATCH_SIZE = 128
 LEARNING_RATE = 0.001
 
@@ -43,8 +46,18 @@ bivae = BiVAECF(
     verbose=True
 )
 
+ibpr = IBPR(max_iter=1, verbose=True)
+ibpr.fit(X, y)
+# all_preds = rank(ibpr, y, user_col='userID', item_col='itemID')
 mdl = bivae.fit(X, y)
 
 all_preds = rank(mdl, y, user_col='userID', item_col='itemID')
 
-all_preds.to_csv("predictions.csv", index=False)
+
+eval_map = map_at_k(test, all_preds, k=10)
+pk = precision_at_k(test, all_preds, k=10)
+rk = recall_k(test, all_preds)
+
+
+print(eval_map)
+print(rk)

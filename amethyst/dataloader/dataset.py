@@ -1,5 +1,5 @@
 from collections import defaultdict, OrderedDict
-from typing import Counter
+from typing import Counter, Tuple
 import warnings
 
 import numpy as np
@@ -9,15 +9,25 @@ from scipy.sparse import csr_matrix, dok_matrix
 
 from .data_utils import estimate_batches, get_rng
 
-class Dataloader(object):
+class Dataloader(object):    
     def __init__(
                 self,
-                user_count,
-                item_count,
-                user_id_mapping,
-                item_id_mapping,
-                user_item_rating,
-                seed=None):
+                user_count: int,
+                item_count: int,
+                user_id_mapping: OrderedDict,
+                item_id_mapping: OrderedDict,
+                user_item_rating: Tuple,
+                seed: int = None):
+        """Rating Matrix
+
+        Args:
+            user_count (int): number of users
+            item_count (int): number of items
+            user_id_mapping (OrderDict): mapping between userID and integer indices
+            item_id_mapping (OrderDict): mapping between ItemID and integer indices
+            user_item_rating (tuple): tuple of arrays: (user, item, rating)
+            seed (int, optional): Random seed for consistent sampling. Defaults to None.
+        """
         self.user_count = user_count
         self.item_count = item_count
         self.user_id_mapping = user_id_mapping
@@ -96,6 +106,11 @@ class Dataloader(object):
     
     @property
     def user_data(self):
+        """Key-Value pair, where key is user and value is a tuple of list: (items, ratings)
+
+        Returns:
+            dict: key is user and value is a tuple of list: (items, ratings)
+        """
         if self.__user_data is not None:
             self.__user_data = defaultdict()
             for user, item, rating in zip(*self.user_item_rating):
@@ -104,10 +119,15 @@ class Dataloader(object):
                 __u_data[1].append(rating)
 
             return self.__user_data
-    
+
 
     @property
     def item_data(self):
+        """Key-Value pair, where key is item and value is a tuple of list: (users, ratings)
+
+        Returns:
+            dict: key is item and value is a tuple of list: (users, ratings)
+        """
         if self.__item_data is None:
             self.__item_data = defaultdict()
             for u, i, r in zip(*self.user_index_rating_tuple):
@@ -119,6 +139,8 @@ class Dataloader(object):
 
     @property
     def matrix(self):
+        """User item matrix in CSR format
+        """
         return self.csr_matrix
 
 
@@ -132,7 +154,7 @@ class Dataloader(object):
             )
         return self.__csr_matrix
 
-    # spase matric as dict of key
+    # spase matrix as dict of key
     @property
     def dok_matrix(self):
         """The user-item interaction matrix in DOK sparse format"""
@@ -147,6 +169,18 @@ class Dataloader(object):
 
     @classmethod
     def build(cls, data, exclude_unknown=False):
+        """Building dataset from data
+
+        Args:
+            data (array): (user, item, rating)
+            exclude_unknown (bool, optional): Skip unknown users & items. Defaults to False.
+
+        Raises:
+            ValueError: If data is empty after removing filtering
+
+        Returns:
+            dataset.Dataloader.dataloader: Dataloader object
+        """
         global_user_map = OrderedDict()
         global_item_map = OrderedDict()
         user_id_map = OrderedDict()

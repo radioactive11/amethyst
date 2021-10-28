@@ -94,9 +94,7 @@ class BiVAECF(BaseModel):
     def eval(self, user_idx, item_idx=None):
         if item_idx is None:
             if self.train_set.is_unknown_user(user_idx):
-                raise ValueError(
-                    "Can't make score prediction for (user_id=%d)" % user_idx
-                )
+                raise ValueError(f"Can't make score prediction for user_id={user_idx}")
 
             theta_u = self.bivae.mu_theta[user_idx].view(1, -1)
             beta = self.bivae.mu_beta
