@@ -129,7 +129,7 @@ A recommendation engine can be generated in 4 easy steps:
 1. Import the data
 2. Select an algorithm
 3. Train the model
-4. Evaluate the model's performmance
+4. Evaluate the model's performance
 
 ### Data Split ⚗️
 ```py
@@ -318,7 +318,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Arijit Roy - [@your_twitter](https://twitter.com/__radioactive11__) - roy.arijit2001@gmail.com
+Arijit Roy - [@\_radioactive11_](https://twitter.com/_radioactive11_) - roy.arijit2001@gmail.com
 
 Project Link: [https://github.com/radioactive11/amethyst](https://github.com/radioactive11/amethyst)
 
