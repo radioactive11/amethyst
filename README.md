@@ -89,12 +89,11 @@ It requires only three parameters to rank/predict best items for users and vice-
 
 
 ### Built With
+<p align="center">
 <img alt="pytorch" src="https://img.shields.io/badge/pytorch-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white"/>
-
 <img alt="pytorch" src="https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
-
 <img alt="pytorch" src="https://img.shields.io/badge/numpy-013243?style=for-the-badge&logo=numpy&logoColor=white"/>
-
+</p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -356,4 +355,17 @@ Use this space to list resources you find helpful and would like to give credit 
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.or
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-shield]: https://img.shields.io/github/contributors/radioactive11/amethyst.svg?style=for-the-badge
+[contributors-url]: https://github.com/radioactive11/amethyst/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/radioactive11/amethyst.svg?style=for-the-badge
+[forks-url]: https://github.com/radioactive11/amethyst/network/members
+[stars-shield]: https://img.shields.io/github/stars/radioactive11/amethyst.svg?style=for-the-badge
+[stars-url]: https://github.com/radioactive11/amethyst/stargazers
+[issues-shield]: https://img.shields.io/github/issues/radioactive11/amethyst.svg?style=for-the-badge
+[issues-url]: https://github.com/radioactive11/amethyst/issues
+[license-shield]: https://img.shields.io/github/license/radioactive11/amethyst.svg?style=for-the-badge
+[license-url]: https://github.com/radioactive11/amethyst/blob/master/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/arijit--roy
+[product-screenshot]: images/screenshot.png
