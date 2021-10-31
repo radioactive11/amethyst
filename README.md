@@ -67,22 +67,14 @@
 
 <img src="IMAGES/amethyst-flowchart.png" alt="Desc.">
 
-There are a few ways to deal with the challenge of designing recommendation engines. One is to have your own team of engineers and
-data scientists, all highly trained in machine learning, to custom design recommenders to meet your needs.
-
-Smaller companies, typically startups, look for an easier solution to design a recommendation engine wihtout spending much resources.
-
-Not only that, many developers, who do not have a machine learning/data science background want to integrate recommenders in their product.
-
-
-Amethyst aims to solve this problem by providing a low-code recommendation engine generator which is not only easy to train but also efforless to deploy.
-
-It requires only three parameters to rank/predict best items for users and vice-versa
+Amethyst is a low-code, easy to use, GPU-powered recommender engine generator based on PyTorch. It requires only three parameters to rank/predict best items for users and vice-versa
 * User ID (unique identifier for each user)
 * Item ID (unique identifier for each item)
 * User-Item Ratings (user-item rating/interaction scores)
 
+Since all the underlying data operations are being handled by Pandas, amethyst supports a wide variety of database/data storage formats like SQL, NoSQL, CSV, TSV, etc.
 
+The resultant recommendation scores are also obtained as a Pandas Dataframe, which helps in a flexible integration with your application.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
