@@ -318,7 +318,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Arijit Roy - [@your_twitter](https://twitter.com/your_username) - roy.arijit2001@gmail.com
+Arijit Roy - [@your_twitter](https://twitter.com/__radioactive11__) - roy.arijit2001@gmail.com
 
 Project Link: [https://github.com/radioactive11/amethyst](https://github.com/radioactive11/amethyst)
 
@@ -328,8 +328,6 @@ Project Link: [https://github.com/radioactive11/amethyst](https://github.com/rad
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
 
 * [BiVAECF](https://dl.acm.org/doi/pdf/10.1145/3437963.3441759)
 * [IBPR](https://www.hadylauw.com/publications/cikm17a.pdf)
