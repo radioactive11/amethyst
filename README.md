@@ -89,7 +89,7 @@ It requires only three parameters to rank/predict best items for users and vice-
 
 
 ### Built With
-<p align="center">
+<p align="left">
 <img alt="pytorch" src="https://img.shields.io/badge/pytorch-EE4C2C?style=for-the-badge&logo=PyTorch&logoColor=white"/>
 <img alt="pytorch" src="https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
 <img alt="pytorch" src="https://img.shields.io/badge/numpy-013243?style=for-the-badge&logo=numpy&logoColor=white"/>
