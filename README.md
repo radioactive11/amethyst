@@ -284,13 +284,11 @@ rk = recall_k(test, predictions)
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Add Changelog
-- [x] Add back to top links
-- [] Add Additional Templates w/ Examples
-- [] Add "components" document to easily copy & paste sections of the readme
-- [] Multi-language Support
-    - [] Chinese
-    - [] Spanish
+- [] Build API Wrapper
+- [] Use Elastic Search to save recommendations
+- [] Add more algorithms
+- [] Add content-based recommendation generation
+
 
 See the [open issues](https://github.com/radioactive11/amethyst/issues) for a full list of proposed features (and known issues).
 
